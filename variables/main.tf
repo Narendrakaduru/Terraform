@@ -73,8 +73,23 @@ resource "aws_security_group_rule" "example_egress" {
   cidr_blocks = ["0.0.0.0/0"]  # Allow traffic to all destinations
 }
 
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"]  # Canonical's AWS account ID for Ubuntu AMIs
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
 resource "aws_instance" "Demo-1" {
-  ami                    = var.ubuntu_ami
+  ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.vm_type
   key_name               = var.demo_key
   subnet_id              = var.my_subnet
